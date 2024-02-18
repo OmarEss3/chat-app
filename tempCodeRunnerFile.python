@@ -1,0 +1,37 @@
+import pymongo
+import matplotlib.pyplot as plt
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+db = client['DB']
+heart_collection = db['heart']
+data = list(heart_collection.find({}, {'_id': 0, 'age': 1, 'chol': 1, 'sex': 1}))
+ages = [entry['age'] for entry in data]
+cholesterol = [entry['chol'] for entry in data]
+sexes = [entry['sex'] for entry in data]
+# Scatter plot 
+plt.figure(figsize=(10, 5))
+for sex in set(sexes):
+    plt.scatter(
+        [ages[i] for i in range(len(ages)) if sexes[i] == sex],
+        [cholesterol[i] for i in range(len(cholesterol)) if sexes[i] == sex],
+        label='Male' if sex == 1 else 'Female'
+    )
+plt.xlabel('Age')
+plt.ylabel('Cholesterol')
+plt.title('Age vs Cholesterol with Sex Differentiation')
+plt.legend()
+plt.show()
+# Histogram 
+plt.figure(figsize=(8, 5))
+plt.hist(ages, bins=20, alpha=0.7)
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.title('Age Distribution')
+plt.grid(True)
+plt.show()
+# Pie Chart
+sex_labels = ['Female', 'Male']
+sex_counts = [sexes.count(0), sexes.count(1)]
+plt.figure(figsize=(6, 6))
+plt.pie(sex_counts, labels=sex_labels, autopct='%1.1f%%', startangle=140)
+plt.title('Sex Distribution')
+plt.show()
